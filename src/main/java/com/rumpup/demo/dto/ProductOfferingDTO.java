@@ -15,13 +15,15 @@ public class ProductOfferingDTO implements Serializable{
 	private Boolean sellIndicator;
 	private POState state;
 	
+	public ProductOfferingDTO() {
+	}
 	
 	public ProductOfferingDTO(ProductOffering obj) {
 		id = obj.getId();
 		productName = obj.getProductName();
 		unitPrice = obj.getUnitPrice();
 		sellIndicator = obj.getSellIndicator();
-		state = obj.getState();
+		state = obj.getState(); 
 	}
 	
 	public Integer getId() {

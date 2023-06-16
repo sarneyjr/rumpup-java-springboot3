@@ -5,26 +5,31 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.rumpup.demo.entities.Address;
 import com.rumpup.demo.entities.Customer;
 import com.rumpup.demo.entities.Order;
+import com.rumpup.demo.entities.User;
 import com.rumpup.demo.entities.enums.CustomerType;
 
 public class CustomerDTO implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
 	private Integer id;
+	private Integer userId;
 	private String 	customerName;
 	private Integer documentNumber;
 	private String 	customerStatus;
 	private String 	creditScore;
+	@JsonIgnore
 	private String	password;
 
 	private Set<Address> address = new HashSet<>();
 	private Set<Order> orders = new HashSet<>();
 	
-	private CustomerType customerType;
+	private User user;
 	
+	private CustomerType customerType;
 	
 	//constructors
 	public CustomerDTO() {
@@ -37,6 +42,8 @@ public class CustomerDTO implements Serializable{
 		customerStatus = obj.getCustomerStatus();
 		creditScore = obj.getCreditScore();
 		password = obj.getPassword();
+		user = obj.getUser();
+		userId = user.getId();
 	}
 	
 	public CustomerDTO(Customer obj, Set<Address> address, Set<Order> orders) {
@@ -99,7 +106,6 @@ public class CustomerDTO implements Serializable{
 		this.password = password;
 	}
 	
-
 	public CustomerType getCustomerType() {
 		return customerType;
 	}
@@ -122,6 +128,23 @@ public class CustomerDTO implements Serializable{
 
 	public void setOrders(Set<Order> orders) {
 		this.orders = orders;
+	}
+	
+	@JsonIgnore
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
+	public Integer getUserId() {
+		return userId;
+	}
+
+	public void setUserId(Integer userId) {
+		this.userId = userId;
 	}
 
 	//hashcode and equals

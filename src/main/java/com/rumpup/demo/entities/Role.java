@@ -3,16 +3,23 @@ package com.rumpup.demo.entities;
 import java.io.Serializable;
 import java.util.Objects;
 
-import com.rumpup.demo.entities.enums.Authorities;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+
+import com.rumpup.demo.entities.enums.Authorities;
 
 @Entity
 @Table(name = "tb_roles")
+@SQLDelete(sql = "UPDATE tb_roles SET deleted = 1 WHERE id=?")
+//@FilterDef(name = "deletedUserFilter", parameters = @ParamDef(name = "isDeleted", type = "boolean"))
+//@Filter(name = "deletedProductFilter", condition = "deleted = :isDeleted")
+@Where(clause = "deleted=false")
 public class Role implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
@@ -20,7 +27,8 @@ public class Role implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer 	id;
 	private Authorities authority;
-
+	
+	private boolean deleted = Boolean.FALSE; // Nova propriedade para indicar se o registro está excluído
 	
 	public Role() {
 	}
@@ -31,6 +39,13 @@ public class Role implements Serializable {
 	}
 	
 	//getters and setters
+	
+	//CODE FOR SECURITY (RETURN AUTHORITY IN STRING)
+	public String getAuthorityinString() {
+		String authorityString = authority.toString();
+		return authorityString;
+	}
+	
 	public Integer getId() {
 		return id;
 	}
@@ -47,6 +62,13 @@ public class Role implements Serializable {
 		this.authority = authority;
 	}
 	
+	public boolean getDeleted() {
+		return deleted;
+	}
+
+	public void setDeleted(boolean deleted) {
+		this.deleted = deleted;
+	}
 
 	//hashcode and equals
 	@Override

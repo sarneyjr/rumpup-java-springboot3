@@ -21,6 +21,6 @@ public class AddressService {
 	}
 	public Address findById(Integer id) {
 		Optional<Address> obj = repository.findById(id);
-		return obj.orElseThrow(() -> new ObjectNotFoundException(obj, "Objeto não encontrado"));
+		return obj.orElseThrow(() -> new ObjectNotFoundException(id, "Objeto não encontrado"));
 	}
 }

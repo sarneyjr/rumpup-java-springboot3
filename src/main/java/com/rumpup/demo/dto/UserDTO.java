@@ -19,7 +19,7 @@ public class UserDTO implements Serializable {
 	
 	private Set<Role> roles = new HashSet<>();
 
-	public UserDTO() {
+	public UserDTO() { 
 	}
 
 	public UserDTO(User obj) {

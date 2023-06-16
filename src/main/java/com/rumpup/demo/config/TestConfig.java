@@ -60,20 +60,22 @@ public class TestConfig implements CommandLineRunner{
 		
 		productRepository.saveAll(Arrays.asList(p1,p2,p3));
 		
-		User u1 = new User(null, "maria.sila@gmail.com", "1234");
-		User u2 = new User(null, "joao.sila@gmail.com", "4225");
+		Role r1 = new Role(null, Authorities.ADMIN);
+		Role r2 = new Role(null, Authorities.OPERATOR);
+		
+		User u1 = new User(null, "admin@gmail.com", "$2a$10$zMnEFrdPRcZpu8kg2LigI.hrtDEnPqmppAcx/FxXOfv/OtUNIkIMq");
+		User u2 = new User(null, "operator@gmail.com", "$2a$10$zMnEFrdPRcZpu8kg2LigI.hrtDEnPqmppAcx/FxXOfv/OtUNIkIMq");
+		
+		u1.addRole(r1);
+		u2.addRole(r2);
+		
+		userRepository.saveAll(Arrays.asList(u1,u2));
 		
 		Customer c1 = new Customer(null, "maria silva", 123, "Ativo", "1234" ,"good", CustomerType.LegalPerson, u1);
 		Customer c2 = new Customer(null, "joao pereira", 147, "Ativo", "654" ,"excellent", CustomerType.NaturalPerson, u2);
 		
-		u1.setCustomer(c1);
-		u2.setCustomer(c2);
 		
-		Role r1 = new Role(null, Authorities.Admin);
-		Role r2 = new Role(null, Authorities.Operator);
-		
-		u1.addRole(r1);
-		u2.addRole(r2);
+
 		
 		Order o1 = new Order(null, Instant.parse("2019-07-21T03:42:10Z"),c1);
 		Order o2 = new Order(null, Instant.parse("2019-07-22T15:21:22Z"),c2); 
@@ -84,8 +86,7 @@ public class TestConfig implements CommandLineRunner{
 		
 		o1.setAddress(a1);
 		o2.setAddress(a3);
-		
-		userRepository.saveAll(Arrays.asList(u1,u2));
+
 		customerRepository.saveAll(Arrays.asList(c1,c2));
 		addressRepository.saveAll(Arrays.asList(a1,a2,a3));
 		orderRepository.saveAll(Arrays.asList(o1,o2));
@@ -95,7 +96,6 @@ public class TestConfig implements CommandLineRunner{
 		OrderItem oi2 = new OrderItem(o1, p2, 0.95, 1);
 		OrderItem oi3 = new OrderItem(o2, p1, 0.8, 3);
 
-		
 		orderItemRepository.saveAll(Arrays.asList(oi1,oi2,oi3));
 	}	
 }

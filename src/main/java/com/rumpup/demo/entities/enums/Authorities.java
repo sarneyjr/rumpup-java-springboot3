@@ -1,9 +1,11 @@
 package com.rumpup.demo.entities.enums;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public enum Authorities {
 	
-	Admin(1),
-	Operator(2);
+	@JsonProperty("ADMIN") ADMIN(1),
+	@JsonProperty("OPERATOR") OPERATOR(2);
 	
 	private int code;
 	

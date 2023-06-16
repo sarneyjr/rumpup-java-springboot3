@@ -3,16 +3,26 @@ package com.rumpup.demo.entities;
 import java.io.Serializable;
 import java.util.Objects;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "tb_address")
+@SQLDelete(sql = "UPDATE tb_address SET deleted = 1 WHERE id=?")
+//@FilterDef(name = "deletedUserFilter", parameters = @ParamDef(name = "isDeleted", type = "boolean"))
+//@Filter(name = "deletedProductFilter", condition = "deleted = :isDeleted")
+@Where(clause = "deleted=false")
 public class Address implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
@@ -22,12 +32,18 @@ public class Address implements Serializable {
 	private String 	street;
 	private Integer houseNumber;
 	private String 	neigborhood;
+	
+	@NotNull
 	private Integer zipCode;
+	@NotNull
 	private String 	country;
 	
 	@ManyToOne
+	@JsonIgnore
 	@JoinColumn(name = "custumer_id")
 	private Customer customer;
+	
+	private boolean deleted = Boolean.FALSE; // Nova propriedade para indicar se o registro está excluído
 	
 	public Address() {
 	}
@@ -100,6 +116,14 @@ public class Address implements Serializable {
 	public void setCustomer(Customer customer) {
 		this.customer = customer;
 	}
+	
+	public boolean isDeleted() {
+		return deleted;
+	}
+
+	public void setDeleted(boolean deleted) {
+		this.deleted = deleted;
+	}
 
 	//hashcode and equals
 	@Override
@@ -118,4 +142,5 @@ public class Address implements Serializable {
 		Address other = (Address) obj;
 		return Objects.equals(id, other.id);
 	}
+
 }

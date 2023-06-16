@@ -3,12 +3,12 @@ package com.rumpup.demo.entities.pk;
 import java.io.Serializable;
 import java.util.Objects;
 
+import javax.persistence.Embeddable;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+
 import com.rumpup.demo.entities.Order;
 import com.rumpup.demo.entities.ProductOffering;
-
-import jakarta.persistence.Embeddable;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 
 @Embeddable
 public class OrderItemPK implements Serializable{

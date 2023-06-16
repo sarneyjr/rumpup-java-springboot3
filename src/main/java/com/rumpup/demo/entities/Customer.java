@@ -5,30 +5,48 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.rumpup.demo.entities.enums.CustomerType;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
-
 @Entity
-@Table(name = "tb_customer")
+@Table(name = "tb_customer", uniqueConstraints = @UniqueConstraint(columnNames = {"documentNumber"}))
+@SQLDelete(sql = "UPDATE tb_customer SET deleted = 1 WHERE id=?")
+//@FilterDef(name = "deletedUserFilter", parameters = @ParamDef(name = "isDeleted", type = "boolean"))
+//@Filter(name = "deletedProductFilter", condition = "deleted = :isDeleted")
+@Where(clause = "deleted=false")
 public class Customer implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
+	
+	@NotNull
 	private String 	customerName;
+
+	@Column(nullable = false)
 	private Integer documentNumber;
+	
 	private String 	customerStatus;
 	private String 	creditScore;
+	
+	@JsonIgnore
 	private String	password;
 	
 	private CustomerType customerType;
@@ -37,12 +55,14 @@ public class Customer implements Serializable{
 	@OneToOne
 	private User user;
 	
+	private boolean deleted = Boolean.FALSE; // Nova propriedade para indicar se o registro está excluído
+	
 	@JsonIgnore
 	@OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
 	private Set<Address> address = new HashSet<>();
 
 	@JsonIgnore
-    @OneToMany(mappedBy = "customer")
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL)
 	private Set<Order> orders = new HashSet<>();
 	
 	//constructors
@@ -102,7 +122,8 @@ public class Customer implements Serializable{
 	public void setCreditScore(String creditScore) {
 		this.creditScore = creditScore;
 	}
-
+	
+	@JsonIgnore
 	public String getPassword() {
 		return password;
 	}
@@ -110,7 +131,7 @@ public class Customer implements Serializable{
 	public void setPassword(String password) {
 		this.password = password;
 	}
-	
+
 	public User getUser() {
 		return user;
 	}
@@ -118,6 +139,7 @@ public class Customer implements Serializable{
 	public void setUser(User user) {
 		this.user = user;
 	}
+	
 	public CustomerType getCustomerType() {
 		return customerType;
 	}
@@ -130,8 +152,10 @@ public class Customer implements Serializable{
 		return address;
 	}
 
-	public void setAddress(Set<Address> address) {
-		this.address = address;
+	public void setAddress(Address address2) {
+	    if (address2 != null) {
+	        this.address.add(address2);
+	    }
 	}
 
 	public Set<Order> getOrders() {
@@ -140,6 +164,14 @@ public class Customer implements Serializable{
 
 	public void setOrders(Set<Order> orders) {
 		this.orders = orders;
+	}
+
+	public boolean getDeleted() {
+		return deleted;
+	}
+
+	public void setDeleted(boolean deleted) {
+		this.deleted = deleted;
 	}
 
 	@Override

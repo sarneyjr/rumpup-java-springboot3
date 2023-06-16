@@ -21,7 +21,7 @@ public class RoleResource {
 
 	@GetMapping
 	public ResponseEntity<List<Role>> findAll() {
-		List<Role> list = service.findAll();
+		List<Role> list = (List<Role>) service.findAll();
 		return ResponseEntity.ok().body(list);
 	}
 	

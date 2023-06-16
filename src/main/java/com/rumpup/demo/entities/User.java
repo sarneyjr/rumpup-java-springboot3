@@ -5,44 +5,81 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
+
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+import org.springframework.lang.NonNull;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 //Serializable is an interface used to object being transfered at network, or to be record in files..
 @Entity
 @Table(name = "tb_user")
+@SQLDelete(sql = "UPDATE tb_user SET deleted = 1 WHERE id=?")
+//@FilterDef(name = "deletedUserFilter", parameters = @ParamDef(name = "isDeleted", type = "boolean"))
+//@Filter(name = "deletedProductFilter", condition = "deleted = :isDeleted")
+@Where(clause = "deleted=false")
 public class User implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
-	private String 	email;
-	private String	password;
+	private Integer id; 
 	
-    @OneToMany(cascade = CascadeType.ALL)
+	 @Pattern(regexp = "\\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Z|a-z]{2,}\\b",
+	            message = "Invalid Email")
+	private String 	email;
+	
+	@NonNull
+	private String password;
+
+	@OneToOne(cascade = CascadeType.REFRESH)
+	@JoinColumn(name = "customer_id")
+	private Customer customer;
+
+	private boolean deleted = Boolean.FALSE; // Nova propriedade para indicar se o registro está excluído
+	
+	@ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	private Set<Role> roles = new HashSet<>();
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "customer_id")
-    private Customer customer;
-
-    
 	public User() {
 	}
 
 	public User(Integer id, String email, String password) {
 
-		this.id = id;
-		this.email = email;
+		this.id = 		id;
+		this.email = 	email;
 		this.password = password;
+	}
+
+	// getters and setters
+
+	// FOR SECURITY (CHANGE THE AUTHORITIES OF AN USER TO A STRING LIST)
+	@JsonIgnore
+	public String[] getRolesinString() {
+
+		String[] rolesId = new String[roles.size()];
+
+		Integer index = 0;
+
+		for (Role i : roles) {
+			rolesId[index++] = i.getAuthorityinString();
+		}
+
+		return rolesId;
 	}
 
 	public Integer getId() {
@@ -88,7 +125,15 @@ public class User implements Serializable {
 	public void addRole(Role role) {
 		roles.add(role);
 	}
-	
+
+	public boolean isDeleted() {
+		return deleted;
+	}
+
+	public void setDeleted(boolean deleted) {
+		this.deleted = deleted;
+	}
+
 	@Override
 	public int hashCode() {
 		return Objects.hash(id);
